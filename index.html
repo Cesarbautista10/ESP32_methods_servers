@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ESP32 Control Interface</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+        .container {
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            margin-bottom: 20px;
+        }
+        .btn {
+            padding: 10px 20px;
+            margin: 5px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .btn-get {
+            background-color: #4CAF50;
+            color: white;
+        }
+        .btn-post, .btn-put, .btn-delete, .btn-patch {
+            background-color: #2196F3;
+            color: white;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background: #fafafa;
+            white-space: pre-wrap; /* Keep the JSON format */
+        }
+        .description {
+            margin-top: 10px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background: #fff8dc;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>ESP32 Control Interface</h1>
+        <button class="btn btn-get" onclick="sendRequest('GET')">GET Data</button>
+        <button class="btn btn-post" onclick="sendRequest('POST')">POST Data</button>
+        <button class="btn btn-put" onclick="sendRequest('PUT')">PUT Data</button>
+        <button class="btn btn-delete" onclick="sendRequest('DELETE')">DELETE Data</button>
+        <button class="btn btn-patch" onclick="sendRequest('PATCH')">PATCH Data</button>
+        <div class="description" id="description">Click a button to see the definition and perform the action.</div>
+        <div class="result" id="result">Result will appear here</div>
+    </div>
+
+    <script>
+        function sendRequest(method) {
+            let url = '';
+            let data = {};
+            let description = '';
+
+            switch(method) {
+                case 'GET':
+                    url = '/get_data';
+                    description = 'GET: Retrieves data from the server. It is used to request data from a specified resource.';
+                    break;
+                case 'POST':
+                    url = '/post_data';
+                    data = { name: "Cesar", age: 30 }; // Example data
+                    description = 'POST: Submits data to be processed to a specified resource. It is often used when submitting forms or uploading files.';
+                    break;
+                case 'PUT':
+                    url = '/put_data';
+                    data = { name: "Cesar", age: 31 }; // Example data
+                    description = 'PUT: Updates a current resource with new data. It replaces all current representations of the target resource with the request payload.';
+                    break;
+                case 'DELETE':
+                    url = '/delete_data';
+                    description = 'DELETE: Deletes the specified resource from the server.';
+                    break;
+                case 'PATCH':
+                    url = '/patch_data';
+                    data = { age: 32 }; // Example data
+                    description = 'PATCH: Applies partial modifications to a resource. It is used to update a part of the resource.';
+                    break;
+                default:
+                    console.error('Unsupported method:', method);
+                    return;
+            }
+
+            document.getElementById('description').innerText = description;
+
+            fetch(url, {
+                method: method,
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: method !== 'GET' && method !== 'DELETE' ? JSON.stringify(data) : null
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('result').innerText = JSON.stringify(data, null, 2);
+            })
+            .catch(error => console.error('Error:', error));
+        }
+    </script>
+</body>
+</html>
